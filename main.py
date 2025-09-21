@@ -120,6 +120,7 @@ def komnata(message):
         bot.send_message(message.from_user.id, "введи название комнаты которую ты хочешь запустить")
         wait_for_start = True
 
+
     elif wait_for_start:
         komnaty = os.listdir()
         name_proverki = "komnata " + message.text + ".txt"
@@ -128,13 +129,30 @@ def komnata(message):
             if i == name_proverki:
                 proverka = open(name_proverki, "r")
                 if message.from_user.id == int(proverka.readline().split()[1]):
+                    proverka.close()
+                    proverka = open(name_proverki, "r")
                     bot.send_message(message.from_user.id, "начинаю")
-                    peremeshanie = random.randint(1, 10)
-                    b = 0
-                    while b < peremeshanie:
-                        b += 1
-                        bot.send_message(message.from_user.id, b)
+                    lines = proverka.readlines()
+                    liness = 0
+                    for line in lines:
+                        liness += 1
+                    liness -= 1
+                    peremeshanie = random.randint(1, liness)
+                    proverka.close()
+                    proverka = open(name_proverki, "r")
+                    lines = proverka.readlines()
+                    gifts = open(name_proverki, "a")
+                    linesss = ""
+                    for line in lines:
+                        linesss = linesss + line.split()[0] + " "
+                    print(linesss.split()[0] + " " + linesss.split()[peremeshanie])
+
+
+
+
         wait_for_start = False
+
+
 
 
 bot.polling(none_stop=True)

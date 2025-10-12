@@ -7,7 +7,7 @@ wait = False
 wait1 = False
 wait_for_start = False
 
-token = "8041543227:AAE36P70e5fBsfX14YOCsSfRZ3oxw12OkpA"
+token = ""
 bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
@@ -120,7 +120,9 @@ def komnata(message):
         bot.send_message(message.from_user.id, "введи название комнаты которую ты хочешь запустить")
         wait_for_start = True
 
+
     elif wait_for_start:
+        pon = 0
         komnaty = os.listdir()
         name_proverki = "komnata " + message.text + ".txt"
         for i in komnaty:
@@ -128,13 +130,47 @@ def komnata(message):
             if i == name_proverki:
                 proverka = open(name_proverki, "r")
                 if message.from_user.id == int(proverka.readline().split()[1]):
+                    proverka.close()
+                    proverka = open(name_proverki, "r")
                     bot.send_message(message.from_user.id, "начинаю")
-                    peremeshanie = random.randint(1, 10)
-                    b = 0
-                    while b < peremeshanie:
-                        b += 1
-                        bot.send_message(message.from_user.id, b)
+                    lines = proverka.readlines()
+                    liness = 0
+                    for line in lines:
+                        liness += 1
+                    liness -= 1
+                    peremeshanie = random.randint(1, liness)
+                    proverka.close()
+                    proverka = open(name_proverki, "r")
+                    lines1 = proverka.readlines()
+                    id_users = []
+                    us_users = []
+                    for line in lines1:
+                        parts = line.strip().split()
+                        id_users.append(parts[1])
+                        us_users.append(parts[0])
+                    print(us_users, id_users)
+                    receivers = us_users[1:] + [us_users[0]]
+                    for i in range(len(us_users)):
+                        bot.send_message(id_users[i], f"🎅 ты даришь {receivers[i]}")
+                        print(id_users[i], f"🎅 ты даришь {receivers[i]}")
+
+
+                    '''
+                    for n in lines:
+                        idd = linessss.split()[pon]
+                        bot.send_message(idd, "ты даришь подарок " + linesss.split()[peremeshanie - pon])
+                        print(linessss.split()[pon] + " ты даришь подарок " + linesss.split()[peremeshanie - pon])
+                        pon += 1'''
+
+
+
+
+
+
+
         wait_for_start = False
+
+
 
 
 bot.polling(none_stop=True)

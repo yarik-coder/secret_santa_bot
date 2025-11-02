@@ -7,7 +7,7 @@ wait = False
 wait1 = False
 wait_for_start = False
 
-token = "8041543227:AAE36P70e5fBsfX14YOCsSfRZ3oxw12OkpA"
+token = ""
 bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
@@ -45,7 +45,7 @@ def komnata(message):
         komnaty = os.listdir()
         contunie = True
         for i in komnaty:
-            print(i)
+            #print(i)
             if i == name:
                 wait = False
                 wait1 = False
@@ -78,16 +78,18 @@ def komnata(message):
         n = []
         for i in komnaty:
             n.append(i)
-        print(n)
+        #print(n)
 
     elif wait1 and not wait:
+        cont1 = False
         komnaty = os.listdir()
+        pon = message.text
         join_in_room = "komnata " + message.text + ".txt"
         name = "komnata " + message.text + ".txt"
         a1 = message.from_user.username
         a2 = message.from_user.id
         cont = True
-        a = "@" + a1 + " " + str(a2) + "\n"
+        a = "@" + a1 + " " + str(a2) + " "
         for i in n:
             if i == join_in_room:
                 lines = open(join_in_room, "r")
@@ -100,27 +102,58 @@ def komnata(message):
             wait1 = False
             wait = False
             wait2 = False
+
             for i in komnaty:
                 #print(i)
                 if i == join_in_room:
                     wait2 = True
-        if cont and wait2:
-            name_komnaty = open(name, "a")
+        bot.send_message(message.from_user.id,"введи коментарий к подарку например 'не дарите мне носки' или 'подарите мне фен' и тп")
+        bot.send_message(message.from_user.id, "если не хотите оставлять коментарий просто поставьте точку")
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn_pon1 = types.KeyboardButton("да")
+        btn_pon2 = types.KeyboardButton("нет")
+        markup.add(btn_pon1, btn_pon2)
+        bot.send_message(message.from_user.id, "хочешь добваить комнетарий?", reply_markup=markup)
+
+
+        if message.text == "да":
+            cont1 = True
+        elif cont1 and wait2:
+            pozelanie = message.text
+            a = a + pozelanie + "\n"
+
+        elif message.text == "нет":
+            cont1 = True
+            pozelanie = "."
+            a = a + pozelanie + "\n"
+
+
+        if cont and wait2 and cont1:
+            name_komnaty = open(name, "a", encoding="UTF-8")
             name_komnaty.write(a)
             name_komnaty.close()
             bot.send_message(message.from_user.id, "вы успешно присоеденились к комнате")
             wait1 = False
             wait = False
+            wait2 = False
+            cont = False
+
+            cont1 = True
+
         elif not cont and wait2:
             bot.send_message(message.from_user.id, "вы уже есть в комнате")
             wait1 = False
             wait = False
+            wait2 = False
+            cont = False
 
     elif message.text == "запустить тайного санту":
         bot.send_message(message.from_user.id, "введи название комнаты которую ты хочешь запустить")
         wait_for_start = True
 
+
     elif wait_for_start:
+        pon = 0
         komnaty = os.listdir()
         name_proverki = "komnata " + message.text + ".txt"
         for i in komnaty:
@@ -128,13 +161,47 @@ def komnata(message):
             if i == name_proverki:
                 proverka = open(name_proverki, "r")
                 if message.from_user.id == int(proverka.readline().split()[1]):
+                    proverka.close()
+                    proverka = open(name_proverki, "r")
                     bot.send_message(message.from_user.id, "начинаю")
-                    peremeshanie = random.randint(1, 10)
-                    b = 0
-                    while b < peremeshanie:
-                        b += 1
-                        bot.send_message(message.from_user.id, b)
+                    lines = proverka.readlines()
+                    liness = 0
+                    for line in lines:
+                        liness += 1
+                    liness -= 1
+                    peremeshanie = random.randint(1, liness)
+                    proverka.close()
+                    proverka = open(name_proverki, "r")
+                    lines1 = proverka.readlines()
+                    id_users = []
+                    us_users = []
+                    for line in lines1:
+                        parts = line.strip().split()
+                        id_users.append(parts[1])
+                        us_users.append(parts[0])
+                    #print(us_users, id_users)
+                    receivers = us_users[1:] + [us_users[0]]
+                    for i in range(len(us_users)):
+                        bot.send_message(id_users[i], f"🎅 ты даришь {receivers[i]}")
+                        #print(id_users[i], f"🎅 ты даришь {receivers[i]}")
+
+
+                    '''
+                    for n in lines:
+                        idd = linessss.split()[pon]
+                        bot.send_message(idd, "ты даришь подарок " + linesss.split()[peremeshanie - pon])
+                        print(linessss.split()[pon] + " ты даришь подарок " + linesss.split()[peremeshanie - pon])
+                        pon += 1'''
+
+
+
+
+
+
+
         wait_for_start = False
+
+
 
 
 bot.polling(none_stop=True)
